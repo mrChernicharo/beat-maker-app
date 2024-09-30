@@ -7,11 +7,13 @@ function NoteToggleButtonComponent({
   noteIdx,
   barIdx,
   trackId,
+  isCurrent,
 }: {
   note: number;
   noteIdx: number;
   barIdx: number;
   trackId: string;
+  isCurrent: boolean;
 }) {
   const { beatId } = useParams();
   const { getBeatById, toggleNote } = useAppStore();
@@ -25,10 +27,15 @@ function NoteToggleButtonComponent({
 
   if (!beat) return null;
 
+  const background = note === 1 ? (isCurrent ? "dodgerblue" : "darkblue") : isCurrent ? "gray" : "";
+  //   const background = note === 1 ? "blue" : "";
+  //   const opacity = isCurrent ? 0.5 : 1;
+
   return (
     <div style={{ marginInline: 2, marginLeft: noteIdx % beat.beatsPerBar === 0 ? 10 : 0 }}>
-      <button style={{ background: note ? "blue" : "" }} onClick={toggle}>
+      <button style={{ background }} onClick={toggle}>
         &nbsp;
+        {/* {noteIdx + barIdx * beat.beatsPerBar * beat.notesPerBeat} */}
       </button>
     </div>
   );
