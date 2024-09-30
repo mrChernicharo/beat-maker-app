@@ -1,15 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Beat, InstrumentName, Track } from "./types";
-
-export const DEFAULT_TRACK: Track = {
-  id: "default-track",
-  instrument: {
-    name: InstrumentName.BassKick,
-    image: "/images/bass-kick.png",
-  },
-  notes: [],
-};
+import { Beat, Instrument } from "./types";
+import { DEFAULT_TRACK } from "./blueprints";
 
 export interface State {
   beats: Beat[];
@@ -19,6 +11,7 @@ export interface State {
   updateBeat: (beatId: string, info: Partial<Beat>) => void;
   addNewTrack: (beatId: string) => void;
   removeTrack: (beatId: string, trackId: string) => void;
+  updateTrackInstrument: (beatId: string, trackId: string, instrument: Instrument) => void;
 }
 
 export const useAppStore = create<State>()(
@@ -37,19 +30,46 @@ export const useAppStore = create<State>()(
       },
       addNewTrack: (beatId: string) => {
         const beatsCopy = get().beats;
-        const idx = beatsCopy.findIndex((b) => b.id === beatId);
-        if (idx < 0) return;
-        beatsCopy[idx] = {
-          ...beatsCopy[idx],
-          tracks: beatsCopy[idx].tracks.concat({ ...DEFAULT_TRACK, id: crypto.randomUUID() }),
+        const beatIdx = beatsCopy.findIndex((b) => b.id === beatId);
+        if (beatIdx < 0) return;
+
+        beatsCopy[beatIdx] = {
+          ...beatsCopy[beatIdx],
+          tracks: beatsCopy[beatIdx].tracks.concat({
+            ...DEFAULT_TRACK,
+            id: crypto.randomUUID(),
+            bars: [
+              {
+                id: crypto.randomUUID(),
+                notes: Array(beatsCopy[beatIdx].beatsPerBar * beatsCopy[beatIdx].notesPerBeat).fill(0),
+              },
+              {
+                id: crypto.randomUUID(),
+                notes: Array(beatsCopy[beatIdx].beatsPerBar * beatsCopy[beatIdx].notesPerBeat).fill(0),
+              },
+            ],
+          }),
         };
         return set({ beats: beatsCopy });
       },
       removeTrack: (beatId: string, trackId: string) => {
         const beatsCopy = get().beats;
-        const idx = beatsCopy.findIndex((b) => b.id === beatId);
-        if (idx < 0) return;
-        beatsCopy[idx] = { ...beatsCopy[idx], tracks: beatsCopy[idx].tracks.filter((tr) => tr.id !== trackId) };
+        const beatIdx = beatsCopy.findIndex((b) => b.id === beatId);
+        if (beatIdx < 0) return;
+        beatsCopy[beatIdx] = {
+          ...beatsCopy[beatIdx],
+          tracks: beatsCopy[beatIdx].tracks.filter((tr) => tr.id !== trackId),
+        };
+        return set({ beats: beatsCopy });
+      },
+      updateTrackInstrument: (beatId: string, trackId: string, instrument: Instrument) => {
+        const beatsCopy = get().beats;
+        const beatIdx = beatsCopy.findIndex((b) => b.id === beatId);
+        if (beatIdx < 0) return;
+        const beat = beatsCopy[beatIdx];
+        const trackCopy = beat.tracks.find((tr) => tr.id === trackId);
+        if (!trackCopy) return;
+        trackCopy.instrument = instrument;
         return set({ beats: beatsCopy });
       },
     }),

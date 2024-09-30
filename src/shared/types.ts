@@ -4,6 +4,11 @@ export enum InstrumentName {
   HiHat = "hi-hat",
 }
 
+export interface Bar {
+  id: string;
+  notes: Array<0 | 1>;
+}
+
 export interface Instrument {
   name: InstrumentName;
   image: string;
@@ -12,7 +17,7 @@ export interface Instrument {
 export interface Track {
   id: string;
   instrument: Instrument;
-  notes: (0 | 1)[];
+  bars: Bar[];
 }
 
 export interface Beat {

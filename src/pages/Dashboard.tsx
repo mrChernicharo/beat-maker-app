@@ -38,8 +38,8 @@ export function Dashboard() {
           <div key={beat.id}>
             <Link to={`/beat/${beat.id}`}>
               <span>{beat.title}</span>
-              <button onClick={() => handleRemoveBeat(beat.id)}>x</button>
             </Link>
+            <button onClick={() => handleRemoveBeat(beat.id)}>x</button>
           </div>
         ))}
       </ul>
