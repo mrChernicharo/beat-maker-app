@@ -12,6 +12,7 @@ export interface State {
   addNewTrack: (beatId: string) => void;
   removeTrack: (beatId: string, trackId: string) => void;
   updateTrackInstrument: (beatId: string, trackId: string, instrument: Instrument) => void;
+  toggleNote: (beatId: string, trackId: string, barIdx: number, noteIdx: number) => void;
 }
 
 export const useAppStore = create<State>()(
@@ -70,6 +71,17 @@ export const useAppStore = create<State>()(
         const trackCopy = beat.tracks.find((tr) => tr.id === trackId);
         if (!trackCopy) return;
         trackCopy.instrument = instrument;
+        return set({ beats: beatsCopy });
+      },
+      toggleNote: (beatId: string, trackId: string, barIdx: number, noteIdx: number) => {
+        const beatsCopy = get().beats;
+        const beatIdx = beatsCopy.findIndex((b) => b.id === beatId);
+        if (beatIdx < 0) return;
+        const beat = beatsCopy[beatIdx];
+        const trackCopy = beat.tracks.find((tr) => tr.id === trackId);
+        if (!trackCopy) return;
+        const bar = trackCopy.bars[barIdx];
+        bar.notes[noteIdx] = bar.notes[noteIdx] === 1 ? 0 : 1;
         return set({ beats: beatsCopy });
       },
     }),
