@@ -1,53 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef } from "react";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import "./App.css";
 
-enum Sound {
-  snare = "snare",
-  bassKick = "bass-kick",
-  hiHat = "hi-hat",
-}
-
-interface Track {
-  sound: Sound;
-  notes: (0 | 1)[];
-}
-
-interface Beat {
-  id: string;
-  title: string;
-  description: string;
-  bpm: number;
-  beatsPerMeasure: number;
-  notesPerBeat: number;
-  tracks: Track[];
-}
-
-interface State {
-  beats: Beat[];
-  addBeat: (beat: Beat) => void;
-  removeBeat: (id: string) => void;
-}
-
-const useStore = create<State>()(
-  persist(
-    (set, get) => ({
-      beats: [],
-      addBeat: (beat: Beat) => set({ beats: get().beats.concat(beat) }),
-      removeBeat: (id: string) => set({ beats: get().beats.filter((b) => b.id !== id) }),
-    }),
-    {
-      name: "beat-maker-app",
-    }
-  )
-);
+import { Link } from "react-router-dom";
+import { Beat } from "../shared/types";
+import { useAppStore } from "../shared/store";
 
 export function Dashboard() {
   const beatTitleInputRef = useRef<HTMLInputElement>(null);
 
-  const { beats, addBeat, removeBeat } = useStore();
+  const { beats, addBeat, removeBeat } = useAppStore();
 
   async function handleAddBeat() {
     if (!beatTitleInputRef.current?.value) return;
@@ -75,8 +36,10 @@ export function Dashboard() {
       <ul>
         {beats.map((beat) => (
           <div key={beat.id}>
-            <span>{beat.title}</span>
-            <button onClick={() => handleRemoveBeat(beat.id)}>x</button>
+            <Link to={`/beat/${beat.id}`}>
+              <span>{beat.title}</span>
+              <button onClick={() => handleRemoveBeat(beat.id)}>x</button>
+            </Link>
           </div>
         ))}
       </ul>
