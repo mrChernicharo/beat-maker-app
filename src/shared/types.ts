@@ -1,11 +1,17 @@
-export enum Sound {
-  snare = "snare",
-  bassKick = "bass-kick",
-  hiHat = "hi-hat",
+export enum InstrumentName {
+  Snare = "snare",
+  BassKick = "bass-kick",
+  HiHat = "hi-hat",
+}
+
+export interface Instrument {
+  name: InstrumentName;
+  image: string;
 }
 
 export interface Track {
-  sound: Sound;
+  id: string;
+  instrument: Instrument;
   notes: (0 | 1)[];
 }
 
