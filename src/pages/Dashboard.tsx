@@ -17,7 +17,7 @@ export function Dashboard() {
       title: beatTitleInputRef.current.value,
       description: "",
       bpm: 120,
-      beatsPerMeasure: 4,
+      beatsPerBar: 4,
       notesPerBeat: 4,
       tracks: [],
     };

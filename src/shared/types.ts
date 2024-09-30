@@ -14,7 +14,7 @@ export interface Beat {
   title: string;
   description: string;
   bpm: number;
-  beatsPerMeasure: number;
+  beatsPerBar: number;
   notesPerBeat: number;
   tracks: Track[];
 }

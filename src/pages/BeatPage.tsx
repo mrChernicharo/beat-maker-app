@@ -1,6 +1,9 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAppStore } from "../shared/store";
-import { useRef, useState } from "react";
+import { BeatsPerBarDisplay } from "../components/beats-per-bar.display";
+import { BpmDisplay } from "../components/bpm.display";
+import { DescriptionDisplay } from "../components/description.display";
+import { NotesPerBeatDisplay } from "../components/notes-per-beat.display";
 
 export function BeatPage() {
   const { beatId } = useParams();
@@ -11,50 +14,17 @@ export function BeatPage() {
 
   return (
     <div>
+      <Link to="/dashboard">←</Link>
+
       <h1>{beat.title}</h1>
 
       <DescriptionDisplay />
-    </div>
-  );
-}
 
-export function DescriptionDisplay() {
-  const { beatId } = useParams();
-  const { getBeatById, updateBeat } = useAppStore();
-  const beat = getBeatById(beatId!);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+      <BpmDisplay />
 
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
+      <BeatsPerBarDisplay />
 
-  if (!beat) return null;
-
-  console.log(beat);
-
-  return (
-    <div>
-      <div>
-        <label htmlFor="beat-description">Description</label>
-      </div>
-      {isEditingDescription ? (
-        <>
-          <textarea ref={textareaRef} defaultValue={beat.description} name="beat-description" id="beat-description" />
-          <button
-            onClick={() => {
-              const val = textareaRef?.current?.value;
-              if (!val) return;
-              updateBeat(beat.id, { description: val });
-              setIsEditingDescription(false);
-            }}
-          >
-            Confirm
-          </button>
-        </>
-      ) : (
-        <>
-          <div>{beat.description || "adicionar descrição"}</div>
-          <button onClick={() => setIsEditingDescription(true)}>Editar</button>
-        </>
-      )}
+      <NotesPerBeatDisplay />
     </div>
   );
 }
