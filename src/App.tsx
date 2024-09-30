@@ -1,70 +1,77 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef, useState } from "react";
-import "./App.css";
+import { useRef } from "react";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import "./App.css";
+
+enum Sound {
+  snare = "snare",
+  bassKick = "bass-kick",
+  hiHat = "hi-hat",
+}
+
+interface Track {
+  sound: Sound;
+  notes: (0 | 1)[];
+}
 
 interface Beat {
   id: string;
   title: string;
+  description: string;
+  bpm: number;
+  beatsPerMeasure: number;
+  notesPerBeat: number;
+  tracks: Track[];
 }
 
 interface State {
   beats: Beat[];
-}
-
-interface Actions {
   addBeat: (beat: Beat) => void;
-  setBeats: (beats: Beat[]) => void;
   removeBeat: (id: string) => void;
 }
 
-const useStore = create<State & Actions>((set) => ({
-  beats: [],
-  setBeats: (beats: Beat[]) => set((state: State) => ({ ...state, beats })),
-  addBeat: (beat: Beat) => set((state: State) => ({ ...state, beats: [...state.beats, beat] })),
-  removeBeat: (id: string) =>
-    set((state: State) => ({ ...state, beats: state.beats.filter((beat) => beat.id !== id) })),
-}));
+const useStore = create<State>()(
+  persist(
+    (set, get) => ({
+      beats: [],
+      addBeat: (beat: Beat) => set({ beats: get().beats.concat(beat) }),
+      removeBeat: (id: string) => set({ beats: get().beats.filter((b) => b.id !== id) }),
+    }),
+    {
+      name: "beat-maker-app",
+    }
+  )
+);
 
-function App() {
+export function Dashboard() {
   const beatTitleInputRef = useRef<HTMLInputElement>(null);
 
-  const { beats, addBeat, setBeats, removeBeat } = useStore();
+  const { beats, addBeat, removeBeat } = useStore();
 
   async function handleAddBeat() {
     if (!beatTitleInputRef.current?.value) return;
-    const newBeat = { id: crypto.randomUUID(), title: beatTitleInputRef.current.value };
+    const newBeat: Beat = {
+      id: crypto.randomUUID(),
+      title: beatTitleInputRef.current.value,
+      description: "",
+      bpm: 120,
+      beatsPerMeasure: 4,
+      notesPerBeat: 4,
+      tracks: [],
+    };
     addBeat(newBeat);
-    localStorage.setItem("beats", JSON.stringify([...(JSON.parse(localStorage.getItem("beats")!) as Beat[]), newBeat]));
     beatTitleInputRef.current.value = "";
   }
 
   async function handleRemoveBeat(id: string) {
     if (!beatTitleInputRef.current) return;
     removeBeat(id);
-    localStorage.setItem(
-      "beats",
-      JSON.stringify([...(JSON.parse(localStorage.getItem("beats")!) as Beat[])].filter((beat) => beat.id !== id))
-    );
   }
-
-  useEffect(() => {
-    if (!localStorage.getItem("beats")) {
-      localStorage.setItem("beats", JSON.stringify([]));
-    }
-    setBeats(JSON.parse(localStorage.getItem("beats")!));
-  }, [setBeats]);
 
   return (
     <div>
-      <h1>beat maker</h1>
-
-      <div>
-        <label htmlFor="beat-title">Title</label>
-        <input id="beat-title" type="text" ref={beatTitleInputRef} />
-        <button onClick={handleAddBeat}>create beat</button>
-      </div>
-
+      <h1>My beats</h1>
       <ul>
         {beats.map((beat) => (
           <div key={beat.id}>
@@ -73,8 +80,13 @@ function App() {
           </div>
         ))}
       </ul>
+
+      <div>
+        <h2>Create new beat</h2>
+        <label htmlFor="beat-title">Title</label>
+        <input id="beat-title" type="text" ref={beatTitleInputRef} />
+        <button onClick={handleAddBeat}>create beat</button>
+      </div>
     </div>
   );
 }
-
-export default App;
