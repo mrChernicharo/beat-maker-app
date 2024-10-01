@@ -5,6 +5,7 @@ import { BpmDisplay } from "../components/bpm.display";
 import { DescriptionDisplay } from "../components/description.display";
 import { NotesPerBeatDisplay } from "../components/notes-per-beat.display";
 import { TracksDisplay } from "../components/tracks.display";
+import { BarsDisplay } from "../components/bars.display";
 
 export function BeatPage() {
   const { beatId } = useParams();
@@ -26,6 +27,8 @@ export function BeatPage() {
       <BeatsPerBarDisplay />
 
       <NotesPerBeatDisplay />
+
+      <BarsDisplay />
 
       <TracksDisplay />
     </div>

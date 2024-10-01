@@ -13,10 +13,12 @@ export function DescriptionDisplay() {
   if (!beat) return null;
 
   return (
-    <div>
+    <div className="max-w-[600px]">
       {isEditingDescription ? (
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <button onClick={() => setIsEditingDescription(false)}>x</button>
+        <div className="relative flex flex-col">
+          <div className="text-right">
+            <button onClick={() => setIsEditingDescription(false)}>x</button>
+          </div>
           <textarea ref={textareaRef} defaultValue={beat.description} name="beat-description" id="beat-description" />
           <button
             onClick={() => {
@@ -30,9 +32,9 @@ export function DescriptionDisplay() {
           </button>
         </div>
       ) : (
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div className="flex items-center">
           <div>{beat.description || "adicionar descrição"}</div>
-          <button onClick={() => setIsEditingDescription(true)}>Editar Descrição</button>
+          <button onClick={() => setIsEditingDescription(true)}>✏️</button>
         </div>
       )}
     </div>

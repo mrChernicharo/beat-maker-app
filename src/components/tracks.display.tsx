@@ -1,47 +1,11 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppStore } from "../shared/store";
-import { useEffect, useState } from "react";
 import { InstrumentSelectModal } from "./instrument-select-modal";
 import { NoteToggleButton } from "./note-toggle-btn";
-import { Beat } from "../shared/types";
+import { usePlay } from "../hooks/usePlay";
 
 const MAX_TRACKS = 6;
-
-export function usePlay(beatId: string) {
-  const { getBeatById } = useAppStore();
-  const beat = getBeatById(beatId!) as Beat;
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currNoteIdx, setCurrNoteIdx] = useState(0);
-
-  const currBar = Math.floor(currNoteIdx / (beat.beatsPerBar * beat.notesPerBeat));
-  const currBarBeat = Math.floor(currNoteIdx / beat.notesPerBeat) - currBar * beat.beatsPerBar;
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (isPlaying) {
-        setCurrNoteIdx((curr) => {
-          return curr + 1 >= beat.beatsPerBar * beat.notesPerBeat * beat.tracks[0].bars.length ? 0 : curr + 1;
-        });
-      } else {
-        clearInterval(timer);
-      }
-    }, 60_000 / (beat.bpm * beat.beatsPerBar));
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [beat.beatsPerBar, beat.bpm, beat.notesPerBeat, beat.tracks, isPlaying]);
-
-  useEffect(() => {
-    console.log(currNoteIdx, currBar, currBarBeat);
-  }, [currBar, currNoteIdx, currBarBeat]);
-
-  return {
-    isPlaying,
-    currNoteIdx,
-    playPause: () => setIsPlaying((prev) => !prev),
-  };
-}
 
 export function TracksDisplay() {
   const { beatId } = useParams();
@@ -54,7 +18,10 @@ export function TracksDisplay() {
   if (!beat) return null;
 
   return (
-    <div style={{ position: "relative", border: "1px dashed gray", maxWidth: "calc(100vw - 100px)" }}>
+    <div
+      style={{ position: "relative", border: "1px dashed gray", maxWidth: "calc(100vw - 100px)" }}
+      // className="relative max-w-[calc(100vw - 100px)]"
+    >
       <div>tracks</div>
 
       <div style={{ position: "absolute" }}>
@@ -78,8 +45,9 @@ export function TracksDisplay() {
                 {bar.notes.map((note, noteIdx) => (
                   <NoteToggleButton
                     key={`note-${trIdx}-${noteIdx}`}
-                    barIdx={barIdx}
                     trackId={track.id}
+                    trackIdx={trIdx}
+                    barIdx={barIdx}
                     noteIdx={noteIdx}
                     note={note}
                     isCurrent={currNoteIdx === noteIdx + barIdx * beat.beatsPerBar * beat.notesPerBeat}

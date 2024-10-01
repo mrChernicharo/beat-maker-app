@@ -9,6 +9,8 @@ export interface State {
   addBeat: (beat: Beat) => void;
   removeBeat: (beatId: string) => void;
   updateBeat: (beatId: string, info: Partial<Beat>) => void;
+  addBar: (beatId: string) => void;
+  removeBar: (beatId: string) => void;
   addNewTrack: (beatId: string) => void;
   removeTrack: (beatId: string, trackId: string) => void;
   updateTrackInstrument: (beatId: string, trackId: string, instrument: Instrument) => void;
@@ -27,6 +29,7 @@ export const useAppStore = create<State>()(
         const idx = beatsCopy.findIndex((b) => b.id === beatId);
         if (idx < 0) return;
         beatsCopy[idx] = { ...beatsCopy[idx], ...info };
+        console.log(":::", beatsCopy[idx]);
         return set({ beats: beatsCopy });
       },
       addNewTrack: (beatId: string) => {
@@ -61,6 +64,24 @@ export const useAppStore = create<State>()(
           ...beatsCopy[beatIdx],
           tracks: beatsCopy[beatIdx].tracks.filter((tr) => tr.id !== trackId),
         };
+        return set({ beats: beatsCopy });
+      },
+      addBar: (beatId: string) => {
+        const beatsCopy = get().beats;
+        const idx = beatsCopy.findIndex((b) => b.id === beatId);
+        if (idx < 0) return;
+        for (const tr of beatsCopy[idx].tracks) {
+          tr.bars.push({ id: crypto.randomUUID(), notes: Array(tr.bars[0].notes.length).fill(0) });
+        }
+        return set({ beats: beatsCopy });
+      },
+      removeBar: (beatId: string) => {
+        const beatsCopy = get().beats;
+        const idx = beatsCopy.findIndex((b) => b.id === beatId);
+        if (idx < 0) return;
+        for (const tr of beatsCopy[idx].tracks) {
+          tr.bars.pop();
+        }
         return set({ beats: beatsCopy });
       },
       updateTrackInstrument: (beatId: string, trackId: string, instrument: Instrument) => {
