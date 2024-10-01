@@ -11,6 +11,7 @@ export interface Bar {
 
 export interface Instrument {
   name: InstrumentName;
+  sound: string;
   image: string;
 }
 

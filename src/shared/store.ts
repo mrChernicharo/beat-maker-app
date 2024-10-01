@@ -28,8 +28,15 @@ export const useAppStore = create<State>()(
         const beatsCopy = get().beats;
         const idx = beatsCopy.findIndex((b) => b.id === beatId);
         if (idx < 0) return;
-        beatsCopy[idx] = { ...beatsCopy[idx], ...info };
-        console.log(":::", beatsCopy[idx]);
+        const res = { ...beatsCopy[idx], ...info };
+
+        for (const track of res.tracks) {
+          for (const bar of track.bars) {
+            bar.notes = Array(res.beatsPerBar * res.notesPerBeat).fill(0);
+          }
+        }
+        beatsCopy[idx] = res;
+
         return set({ beats: beatsCopy });
       },
       addNewTrack: (beatId: string) => {

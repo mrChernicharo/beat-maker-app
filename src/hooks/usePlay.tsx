@@ -15,7 +15,24 @@ export function usePlay(beatId: string) {
     const timer = setInterval(() => {
       if (isPlaying) {
         setCurrNoteIdx((curr) => {
-          return curr + 1 >= beat.beatsPerBar * beat.notesPerBeat * beat.tracks[0].bars.length ? 0 : curr + 1;
+          const nextIdx = curr + 1 >= beat.beatsPerBar * beat.notesPerBeat * beat.tracks[0].bars.length ? 0 : curr + 1;
+          const barIdx = Math.floor(nextIdx / (beat.beatsPerBar * beat.notesPerBeat));
+          const barNoteIdx = nextIdx - barIdx * beat.beatsPerBar * beat.notesPerBeat;
+
+          // console.log({ barNoteIdx, barIdx, nextIdx });
+
+          const soundsToPlay: HTMLAudioElement[] = [];
+          (beat?.tracks || []).forEach((tr) => {
+            if (tr.bars[barIdx]?.notes[barNoteIdx] !== 0) {
+              soundsToPlay.push(new Audio(tr.instrument.sound));
+            }
+          });
+
+          soundsToPlay.forEach((audio) => {
+            audio.play();
+          });
+
+          return nextIdx;
         });
       } else {
         clearInterval(timer);

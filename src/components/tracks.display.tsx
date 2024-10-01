@@ -18,13 +18,10 @@ export function TracksDisplay() {
   if (!beat) return null;
 
   return (
-    <div
-      style={{ position: "relative", border: "1px dashed gray", maxWidth: "calc(100vw - 100px)" }}
-      // className="relative max-w-[calc(100vw - 100px)]"
-    >
+    <div className="relative border-2" style={{ maxWidth: "calc(100vw - 100px)" }}>
       <div>tracks</div>
 
-      <div style={{ position: "absolute" }}>
+      <div className="absolute">
         {beat.tracks.map((track) => (
           <div key={track.id} style={{ display: "flex" }}>
             <div>
@@ -39,9 +36,9 @@ export function TracksDisplay() {
 
       <div style={{ overflowX: "scroll", marginLeft: "150px" }}>
         {beat.tracks.map((track, trIdx) => (
-          <div key={track.id} style={{ display: "flex", paddingBlock: "10px" }}>
+          <div key={track.id} className="flex py-2 gap-2">
             {track.bars.map((bar, barIdx) => (
-              <div key={bar.id} style={{ display: "flex" }}>
+              <div key={bar.id} className="flex bg-green-800 p-1">
                 {bar.notes.map((note, noteIdx) => (
                   <NoteToggleButton
                     key={`note-${trIdx}-${noteIdx}`}

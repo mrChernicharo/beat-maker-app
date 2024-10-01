@@ -7,7 +7,7 @@ function NoteToggleButtonComponent({
   noteIdx,
   barIdx,
   trackId,
-  // trackIdx,
+  trackIdx,
   isCurrent,
 }: {
   note: number;
@@ -23,23 +23,26 @@ function NoteToggleButtonComponent({
 
   const toggle = useCallback(() => {
     if (!beat) return;
-    console.log({ trackId, barIdx, noteIdx, note });
+    console.log({ trackId, trackIdx, barIdx, noteIdx, note });
     toggleNote(beat.id, trackId, barIdx, noteIdx);
-  }, [barIdx, beat, note, noteIdx, toggleNote, trackId]);
+  }, [barIdx, beat, note, noteIdx, toggleNote, trackId, trackIdx]);
 
   if (!beat) return null;
 
   const background = note === 1 ? (isCurrent ? "dodgerblue" : "darkblue") : isCurrent ? "gray" : "";
 
   // const bar = beat.tracks[trackIdx].bars[barIdx];
-  const isCabecaDeTempo = noteIdx % beat.beatsPerBar === 0;
+  const isCabecaDeTempo = noteIdx % beat.notesPerBeat === 0;
+  // beat.tracks[trackIdx].bars[0].notes;
 
   return (
-    <div style={{ marginInline: 2, marginLeft: isCabecaDeTempo ? 10 : 0 }}>
+    <div className="">
       <button style={{ background }} onClick={toggle}>
         {/* &nbsp; */}
         {noteIdx + barIdx * beat.beatsPerBar * beat.notesPerBeat}
+        {/* {noteIdx + 1 + barIdx * beat.beatsPerBar * beat.notesPerBeat} */}
       </button>
+      {isCabecaDeTempo && <div className="w-2 h-4 bg-white"></div>}
     </div>
   );
 }
